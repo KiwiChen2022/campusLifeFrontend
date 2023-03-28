@@ -5,12 +5,12 @@ const Message = (props) => {
 
   return (
     <div className="message">
-      <div className="avatar">
+      <div className="sender">
         <img src={message.sender.avatar} alt={message.sender.name} />
       </div>
-      <div className="content">
+      <div className="text">
         <p>{message.text}</p>
-        <div className="time">{message.time}</div>
+        <div className="timestamp">{message.time}</div>
       </div>
     </div>
   );
