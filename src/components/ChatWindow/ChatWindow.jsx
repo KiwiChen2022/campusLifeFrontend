@@ -4,8 +4,6 @@ import InputBox from './InputBox';
 import WebSocketClient from '../../utils/websocketClient';
 import { list, addMessage } from '../../api/message';
 
-
-
 const ChatWindow = ({uid}) => {
   const query = {to:uid,pageNum:1,pageSize:10};
   
