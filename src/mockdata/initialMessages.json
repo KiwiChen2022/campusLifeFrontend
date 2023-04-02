@@ -1,0 +1,34 @@
+{
+    "1": [
+      {
+        "id": 1,
+        "text": "Hello",
+        "time": "12:34:56 PM",
+        "sender": {
+          "name": "User",
+          "avatar": "https://via.placeholder.com/50"
+        }
+      },
+      {
+        "id": 2,
+        "text": "How are you?",
+        "time": "12:34:56 PM",
+        "sender": {
+          "name": "User",
+          "avatar": "https://via.placeholder.com/50"
+        }
+      }
+    ],
+    "2": [
+      {
+        "id": 1,
+        "text": "Hey there",
+        "time": "12:34:56 PM",
+        "sender": {
+          "name": "User",
+          "avatar": "https://via.placeholder.com/50"
+        }
+      }
+    ]
+  }
+  

@@ -1,6 +1,6 @@
 import React from 'react';
 import ChatListItem from './ChatListItem';
-// import ChatList from './ChatList';
+import { GoOrganization } from "react-icons/go";
 
 const Sidebar = (props) => {
   return (
@@ -18,6 +18,7 @@ const Sidebar = (props) => {
           />
         ))}
       </ul>
+    <GoOrganization className="icon"/>
     </div>
   );
 };

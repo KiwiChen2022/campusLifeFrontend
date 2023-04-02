@@ -1,14 +1,13 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Chats from "./components/Chats";
-import LandingPage from "./components/LandingPage/LandingPage";
+import { HomePage, LandingPage } from "./pages";
 
 const App = () => {
   return (
     <Router>
       <Routes>
         <Route exact path="/" element={<LandingPage />} />
-        <Route exact path="/chats" element={<Chats />} />
+        <Route exact path="/homepage" element={<HomePage />} />
       </Routes>
     </Router>
   );
