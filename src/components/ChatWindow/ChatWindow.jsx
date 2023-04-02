@@ -4,36 +4,25 @@ import InputBox from './InputBox';
 import WebSocketClient from '../../utils/websocketClient';
 import { list, addMessage } from '../../api/message';
 
+const socket = new WebSocketClient('ws://127.0.0.1:8004/ws');
+
+
 const ChatWindow = ({uid}) => {
+
   const query = {to:uid,pageNum:1,pageSize:10};
-  
-  // const [newMessage, setNewMessage] = useState('');
   const [messages, setMessages] = useState([]);
-  // const handleInputChange = (event) => {
-  //   setNewMessage(event.target.value);
-  // };
+  
+  const getAndSetMessages = async (query) => {
+    try {
+      const res = await list(query);
+      setMessages(res.data.list);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  
 
-  const socket = new WebSocketClient('ws://127.0.0.1:8004/ws');
-
-  const handleSend = (newMessage) => {
-    addMessage({to:uid,content:newMessage}).then(res=>{
-    getlist();
-  }).then(()=>{
-    console.log("yes1")
-    socket.send(JSON.stringify({from:localStorage.getItem("im-userid"),to:{uid},message:newMessage,type:2}))
-    console.log("yes2")
-
-  })
-  setNewMessage('');
-  };
-
-  const getlist = ()=>{
-    list(query).then(res=>{
-      let data =  res.data;
-      setMessages(data.list);
-  })}
-
-  const setupWebsocket = ()=>{
+  const setupWebsocket = (query) => {
     // set up websocket
     const messageHandler = (event) => {
       const data = JSON.parse(event.data);
@@ -41,50 +30,60 @@ const ChatWindow = ({uid}) => {
 
       }
       else{
-        getlist();
+        getAndSetMessages(query);
       }
     };
+
     socket.addEventListener('message', messageHandler);
+
     const e = {uid:localStorage.getItem("im-userid"),type:1};
-    setTimeout(()=>{
-                console.log(JSON.stringify(e));
-                console.log(typeof(e));
-                  socket.send(JSON.stringify(e))
-              },1000);
-    // if (socket.readyState === 0){
-    //         setTimeout(()=>{
-    //           console.log(JSON.stringify(e));
-    //           console.log(typeof(e));
-    //             socket.send(JSON.stringify(e))
-    //         },1000);
-    //     }else {
-    //         socket.send(JSON.stringify(e))
-    //     }
+
+    const onOpen = () => {
+      console.log('websocket connection established');
+      socket.send(JSON.stringify(e));
+    };
+
+    if (socket.socket.readyState === WebSocket.OPEN) {   //socket is a wrapper of websocket
+      // websocket is already open, send the message
+      console.log('websocket connection already open');
+      socket.send(JSON.stringify(e));
+    } else {
+      // wait for websocket to open, then send the message
+      socket.addEventListener('open', onOpen);
+    }
 
     return () => {
       socket.removeEventListener('message', messageHandler);
+      socket.removeEventListener('open', onOpen);
     };
+  };
 
-  }
+
+
+  const handleSend = (newMessage) => {
+    addMessage({to:uid,content:newMessage}).then(()=>{
+      getAndSetMessages(query);
+    }).then(()=>{
+      socket.send(JSON.stringify({from:localStorage.getItem("im-userid"),to:uid,message:newMessage,type:2}))
+    })
+  };
 
   useEffect(()=>{
-    getlist();
-    // scrollbarRef.value!.setScrollTop(2200)
-    setupWebsocket();
+    setupWebsocket(query);
+    getAndSetMessages(query);
+    // return () => {
+    //   socket.close();
+    // };
   },[uid])
+
   return (
     <div className="chat-window">
-      {/* <h2>{props.chat.name}</h2> */}
       <div className="messages">
         {messages.map((message) => (
           <Message key={message.id} message={message} />
         ))}
       </div>
-      <InputBox
-        // value={newMessage}
-        // onChange={handleInputChange}
-        onSend={handleSend}
-      />
+      <InputBox onSend={handleSend} />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState } from "react";
 import { FaComments, FaUserAlt, FaCog } from "react-icons/fa";
 import Chats from "../Chat/Chats";
 import UserProfile from "../UserProfile/UserProfile";

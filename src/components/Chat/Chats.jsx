@@ -9,8 +9,6 @@ const Chats = () => {
   // State to store the active chat ID
   const [activeChatId, setActiveChatId] = useState(null);
 
-  // State to store the messages for each chat
-  const [messages, setMessages] = useState(null);
   const [list, setList] = useState([]);
 
   useEffect(()=>{
@@ -19,27 +17,6 @@ const Chats = () => {
     })
     },[])
   
-  
-  // Function to handle sending a message
-  // const handleSendMessage = (inputValue) => {
-  //   if (inputValue.trim() !== "") {
-  //     const newMessage = {
-  //       id: new Date().getTime(),
-  //       text: inputValue,
-  //       time: new Date().toLocaleTimeString(),
-  //       sender: {
-  //         name: "User",
-  //         avatar: "https://via.placeholder.com/50",
-  //       },
-  //     };
-  //     setMessages((prevMessages) => {
-  //       return {
-  //         ...prevMessages,
-  //         [activeChatId]: [...(prevMessages[activeChatId] || []), newMessage],
-  //       };
-  //     });
-  //   }
-  // };
 
   return (
     <div>
@@ -50,7 +27,6 @@ const Chats = () => {
         />
         {activeChatId ? (
           <ChatWindow
-            // onSend={handleSendMessage}
             uid={activeChatId}
           />
         ) : (

@@ -1,3 +1,4 @@
-import { Navigation } from "./Main";
+import { Navigation } from "./Navigation";
+import { Header } from "./Header";
 
-export { Navigation };
+export { Navigation, Header };

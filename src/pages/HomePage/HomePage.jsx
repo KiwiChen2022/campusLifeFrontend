@@ -1,9 +1,6 @@
 import React, { useState,useEffect } from "react";
-import WebSocketClient from "../../utils/websocketClient";
-import { Navigation } from "../../components";
-import Header from "../../components/Header";
+import { Navigation,Header } from "../../components";
 import { getUser } from "../../api/user";
-// const socket = new WebSocketClient('ws://127.0.0.1:8004/ws');
 
 
 function HomePage(){
