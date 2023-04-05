@@ -1,6 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate }  from "react-router-dom";
 import { login } from "../../api/login";
+import {
+    NavBar,
+    WingBlank,
+    List,
+    InputItem,
+    WhiteSpace,
+    Radio,
+    Button
+} from 'antd-mobile'
+import Logo from '../../components/logo/logo'
 
 function LandingPage() {
   const [username, setUsername] = useState("");
@@ -23,21 +33,29 @@ function LandingPage() {
 
   return (
     <div className="landing-page">
-      <h1>Login</h1>
-      {error && <p>{error}</p>}
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button onClick={handleLogin}>Login</button>
+        <NavBar>campus&nbsp;life</NavBar>
+        <Logo/>
+        <WingBlank>
+            <List>
+                <WhiteSpace/>
+                <InputItem
+                    placeholder='please enter username'
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                >username:</InputItem>
+                <WhiteSpace/>
+                <InputItem
+                    placeholder='please enter password'
+                    type="password"
+                    handleLogin
+                    onChange={(e) => setPassword(e.target.value)}
+                >password:</InputItem>
+                <WhiteSpace/>
+
+                <Button type='primary' onClick={handleLogin}>sign in</Button>
+            </List>
+        </WingBlank>
     </div>
   );
 }
