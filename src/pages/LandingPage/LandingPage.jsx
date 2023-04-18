@@ -16,7 +16,7 @@ function LandingPage() {
     };
     
     login(user).then(res=>{
-        localStorage.setItem("mushan-token",res.data);
+        localStorage.setItem("token",res.data);
         navigate("/homepage");
     })
   };
