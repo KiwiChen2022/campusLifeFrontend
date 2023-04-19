@@ -1,10 +1,14 @@
 import React from 'react';
+import styles from './ChatListItem.module.css';
 
 const ChatListItem = ({ chat, isActive, onClick }) => {
   return (
-    <div className={`chat-list-item ${isActive ? 'active' : ''}`} onClick={onClick}>
+    <div
+      className={`${styles.chatListItem} ${isActive ? styles.active : ''}`}
+      onClick={onClick}
+    >
       <img src={chat.image} alt={chat.username} />
-      <div className="chat-details">
+      <div className={styles.chatDetails}>
         <h2>{chat.username}</h2>
         <p>Last message goes here</p>
       </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import styles from './InputBox.module.css';
 
 const InputBox = (props) => {
   const [message, setMessage] = useState('');
@@ -20,7 +21,7 @@ const InputBox = (props) => {
   };
 
   return (
-    <div className="input-box">
+    <div className={styles.inputBox}>
       <input
         type="text"
         placeholder="Type a message"

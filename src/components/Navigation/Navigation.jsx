@@ -1,33 +1,23 @@
-import React, { useState } from "react";
+import React from "react";
+import { NavLink } from "react-router-dom";
 import { FaComments, FaUserAlt, FaCog } from "react-icons/fa";
-import Chats from "../Chat/Chats";
-import UserProfile from "../UserProfile/UserProfile";
-import { Friend } from "../Friend";
-
+import styles from "./Navigation.module.css";
 
 function Navigation() {
-  const [activeView, setActiveView] = useState("chat");
-  const handleNavigation = (view) => {
-    setActiveView(view);
-  };
   return (
-      <div className="navigation">
-      <button onClick={() => handleNavigation("chat")}>
-        <FaComments size={20} color={activeView === "chat" ? "blue" : "black"} />
-      </button>
-      <button onClick={() => handleNavigation("profile")}>
-        <FaUserAlt size={20} color={activeView === "profile" ? "blue" : "black"} />
-      </button>
-      <button onClick={() => handleNavigation("settings")}>
-        <FaCog size={20} color={activeView === "settings" ? "blue" : "black"} />
-      </button>
-      <button onClick={() => handleNavigation("friend")}>
-        <FaCog size={20} color={activeView === "friend" ? "blue" : "black"} />
-      </button>
-      {activeView === "chat" && <Chats />}
-      {activeView === "profile" && <UserProfile />}
-      {activeView === "friend" && <Friend />}
-      {/* {activeView === "settings" && <Settings />} */}
+    <div className={styles.navigation}>
+      <NavLink to="/homepage" activeClassName={styles.active}>
+        <FaComments size={20} />
+      </NavLink>
+      <NavLink to="/homepage/profile" activeClassName={styles.active}>
+        <FaUserAlt size={20} />
+      </NavLink>
+      <NavLink to="/homepage/settings" activeClassName={styles.active}>
+        <FaCog size={20} />
+      </NavLink>
+      <NavLink to="/homepage/friend" activeClassName={styles.active}>
+        <FaCog size={20} />
+      </NavLink>
     </div>
   );
 }

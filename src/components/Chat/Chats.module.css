@@ -1,0 +1,41 @@
+/* .chats {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    background-color: #f4f4f4;
+  }
+  
+  .sidebar {
+    flex: 1;
+    max-width: 350px;
+    border-right: 1px solid #ccc;
+  }
+  
+  .chatWindow {
+    flex: 3;
+  }
+   */
+
+   .chats {
+    display: flex;
+    width: 1000px;; 
+    height: 600px; 
+    margin: 0 auto;
+    overflow: hidden;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  
+  .sidebar {
+    flex: 0 0 200px;
+    border-right: 1px solid #ccc;
+  }
+  
+  .chatWindow {
+    flex: 1;
+    position: relative;
+  }
+  

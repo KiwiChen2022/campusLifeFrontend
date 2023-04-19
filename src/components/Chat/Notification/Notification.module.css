@@ -1,0 +1,13 @@
+.notification {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    background-color: #e1f5fe;
+    border-radius: 5px;
+    color: #0277bd;
+    font-size: 0.9rem;
+    margin: 0.5rem 0;
+    width: 100%;
+  }
+  

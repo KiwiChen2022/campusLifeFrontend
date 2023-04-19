@@ -1,21 +1,20 @@
-import React, { useState,useEffect } from "react";
-import { Navigation,Header } from "../../components";
-import { getUser } from "../../api/user";
+// import React, { useState, useEffect } from "react";
+// import { Navigation, Header } from "../../components";
+// import { getUser } from "../../api/user";
+// import styles from "./HomePage.module.css";
+// import UserImageContext from "../../contexts/UserImageContext";
 
-
-function HomePage(){
-    const [url, setUrl] = useState("");
-    getUser().then(res=>{
-    setUrl(res.data.image)
-    localStorage.setItem("im-userid",res.data.id);
-  })
+// function HomePage() {
   
-    return (
-    <div className="app">
-        <Header />
-        <img src={url}></img>
-        <Navigation />
-    </div>)
-}
 
-export default HomePage;
+//   return (
+//     <div className={styles.app}>
+//       <Header />
+//       <UserImageContext.Provider value={url}>
+//         <Navigation />
+//       </UserImageContext.Provider>
+//     </div>
+//   );
+// }
+
+// export default HomePage;

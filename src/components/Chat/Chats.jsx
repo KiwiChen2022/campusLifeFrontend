@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "./Sidebar";
+import Sidebar from "./Sidebar/Sidebar";
 import ChatWindow from "../ChatWindow/ChatWindow";
-import Notification from "./Notification";
+import { Notification } from "./Notification";
 import { getlist } from "../../api/friend";
+import styles from './Chats.module.css';
 
 
 const Chats = () => {
@@ -18,23 +19,26 @@ const Chats = () => {
     },[])
   
 
-  return (
-    <div>
-        <Sidebar
-          chats={list}
-          activeChatId={activeChatId}
-          onChatClick={setActiveChatId}
-        />
-        {activeChatId ? (
-          <ChatWindow
-            uid={activeChatId}
+    return (
+      <div className={styles.chats}>
+        <div className={styles.sidebar}>
+          <Sidebar
+            chats={list}
+            activeChatId={activeChatId}
+            onChatClick={setActiveChatId}
           />
+        </div>
+        {activeChatId ? (
+          <div className={styles.chatWindow}>
+            <ChatWindow
+              uid={activeChatId}
+            />
+          </div>
         ) : (
           <Notification text="Select a chat to start messaging" />
         )}
       </div>
-    
-  );
+    );
 };
 
 export default Chats;
