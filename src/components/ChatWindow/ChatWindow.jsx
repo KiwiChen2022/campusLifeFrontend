@@ -5,11 +5,10 @@ import WebSocketClient from '../../utils/websocketClient';
 import { list, addMessage } from '../../api/message';
 import styles from './ChatWindow.module.css';
 
-const socket = new WebSocketClient('ws://127.0.0.1:8004/ws');
 
 
 const ChatWindow = ({uid}) => {
-
+  const socket = useRef(null);
   const query = {to:uid,pageNum:1,pageSize:10};
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -22,7 +21,6 @@ const ChatWindow = ({uid}) => {
       setLoading(true);
       const res = await list(query);
       setLoading(false);
-
       if (res.data.list.length < query.pageSize) {
         setHasMore(false);
       }
@@ -53,6 +51,9 @@ const ChatWindow = ({uid}) => {
 
   const setupWebsocket = (query) => {
     // set up websocket
+    if (!socket.current) {
+      socket.current = new WebSocketClient('ws://127.0.0.1:8004/ws');
+    }
     const messageHandler = (event) => {
       const data = JSON.parse(event.data);
       if (data.type == 3){
@@ -63,27 +64,30 @@ const ChatWindow = ({uid}) => {
       }
     };
 
-    socket.addEventListener('message', messageHandler);
+    socket.current.addEventListener('message', messageHandler);
 
     const e = {uid:localStorage.getItem("im-userid"),type:1};
 
     const onOpen = () => {
       console.log('websocket connection established');
-      socket.send(JSON.stringify(e));
+      socket.current.send(JSON.stringify(e));
     };
 
-    if (socket.socket.readyState === WebSocket.OPEN) {   //socket is a wrapper of websocket
+    if (socket.current.socket.readyState === WebSocket.OPEN) {   //socket.current is a wrapper of websocket
       // websocket is already open, send the message
       console.log('websocket connection already open');
-      socket.send(JSON.stringify(e));
+      socket.current.send(JSON.stringify(e));
     } else {
       // wait for websocket to open, then send the message
-      socket.addEventListener('open', onOpen);
+      socket.current.addEventListener('open', onOpen);
     }
 
     return () => {
-      socket.removeEventListener('message', messageHandler);
-      socket.removeEventListener('open', onOpen);
+      socket.current.removeEventListener('message', messageHandler);
+      socket.current.removeEventListener('open', onOpen);
+      if (socket.current) {
+        socket.current.close();
+      }
     };
   };
 
@@ -112,17 +116,16 @@ const ChatWindow = ({uid}) => {
         setMessages((prevMessages) => [...prevMessages, tempMessage]);
   
         // Send message via websocket
-        socket.send(JSON.stringify({from: localStorage.getItem("im-userid"), to: uid, message: newMessage, type: 2}));
+        socket.current.send(JSON.stringify({from: localStorage.getItem("im-userid"), to: uid, message: newMessage, type: 2}));
       });
   };
   
-
   useEffect(()=>{
     setupWebsocket(query);
+  },[])
+
+  useEffect(()=>{
     getAndSetMessages(query);
-    // return () => {
-    //   socket.close();
-    // };
   },[uid])
 
   useEffect(() => {
