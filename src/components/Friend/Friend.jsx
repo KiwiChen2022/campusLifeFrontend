@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { getList, addApply, getApplications, agreeFriend } from "../../api/friend";
+import { getList, addApply, getApplys, agreeFriend } from "../../api/friend";
+import { getUserByUserName } from "../../api/user";
 import styles from "./Friend.module.css";
 
 function Friend() {
   const [friends, setFriends] = useState([]);
-  const [applications, setApplications] = useState([]);
+  const [applys, setApplys] = useState([]);
   const [friendUsername, setFriendUsername] = useState("");
+  const [searchedUser, setSearchedUser] = useState(null);
 
   useEffect(() => {
     fetchFriends();
-    fetchApplications();
+    fetchApplys();
   }, []);
 
   const fetchFriends = async () => {
@@ -17,21 +19,30 @@ function Friend() {
     setFriends(response.data);
   };
 
-  const fetchApplications = async () => {
-    const response = await getApplications();
-    setApplications(response.data);
+  const fetchApplys = async () => {
+    const response = await getApplys();
+    setApplys(response.data);
   };
 
-  const handleAddApply = async () => {
-    await addApply({ username: friendUsername });
-    setFriendUsername("");
+  const handleSearchUser = async () => {
+    const response = await getUserByUserName({ username: friendUsername });
+    setSearchedUser(response.data);
   };
 
-  const handleAgreeFriend = async (application) => {
-    await agreeFriend({ id: application.id });
+  const handleAddApply = async (id) => {
+    if (searchedUser) {
+      await addApply({ tid: id });
+      setFriendUsername("");
+      setSearchedUser(null);
+    }
+  };
+
+  const handleAgreeFriend = async (apply) => {
+    await agreeFriend({ fid: apply.id });
     fetchFriends();
-    fetchApplications();
+    fetchApplys();
   };
+
 
   return (
     <div className={styles.friendContainer}>
@@ -58,15 +69,35 @@ function Friend() {
           value={friendUsername}
           onChange={(e) => setFriendUsername(e.target.value)}
         />
-        <button className={styles.addFriendButton} onClick={handleAddApply}>Add Friend</button>
+        <button className={styles.addFriendButton} onClick={handleSearchUser}>
+          Search
+        </button>
       </div>
+      {searchedUser && (
+        <div className={styles.searchResult}>
+          <img
+            src={searchedUser.image}
+            alt={searchedUser.username}
+            className={styles.friendImage}
+          />
+          {searchedUser.username}
+          <button className={styles.addFriendButton} onClick={()=>handleAddApply(searchedUser.id)}>
+            Add 
+          </button>
+        </div>
+      )}
 
-      <h2 className={styles.title}>Friend Applications</h2>
-      <ul className={styles.applicationList}>
-        {applications.map((application) => (
-                    <li key={application.id} className={styles.applicationListItem}>
-                    {application.username}
-                    <button className={styles.acceptButton} onClick={() => handleAgreeFriend(application)}>Accept</button>
+      <h2 className={styles.title}>New Friends</h2>
+      <ul className={styles.applyList}>
+        {applys.map((apply) => (
+                    <li key={apply.id} className={styles.applyListItem}>
+                    <img
+                        src={apply.image}
+                        alt={apply.username}
+                        className={styles.friendImage}
+                      />
+                    {apply.username}
+                    <button className={styles.addFriendButton} onClick={() => handleAgreeFriend(apply)}>Accept</button>
                     </li>
                     ))}
         </ul>

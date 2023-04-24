@@ -8,10 +8,8 @@ const Sidebar = (props) => {
 
   return (
     <div className={styles.sidebar}>
-      <img src={userUrl} alt="User avatar" />
-      <div className={styles.search}>
-        <input type="text" placeholder="Search" />
-      </div>
+      <img className={styles.userAvatar} src={userUrl} alt="User avatar" />
+      
       <ul className={styles.chatList}>
         {props.chats.map((chat) => (
           <ChatListItem

@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { InputBox } from './InputBox';
 import { Message } from './Message';
 import WebSocketClient from '../../utils/websocketClient';
-import { list, addMessage } from '../../api/message';
+import { list, addMessage, addImg } from '../../api/message';
 import styles from './ChatWindow.module.css';
 
 
 
 const ChatWindow = ({uid}) => {
   const socket = useRef(null);
-  const query = {to:uid,pageNum:1,pageSize:10};
+  const query = useMemo(() => ({ to: uid, pageNum: 1, pageSize: 10 }), [uid]);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -56,7 +56,7 @@ const ChatWindow = ({uid}) => {
     }
     const messageHandler = (event) => {
       const data = JSON.parse(event.data);
-      if (data.type == 3){
+      if (data.type === 3){
 
       }
       else{
@@ -101,13 +101,14 @@ const ChatWindow = ({uid}) => {
   //   })
   // };
 
-  const handleSend = (newMessage) => {
-    addMessage({to: uid, content: newMessage})
-      .then(() => {
+  const handleSend = (data) => {
+    if (data.type === 'text') {
+      const newMessage = data.content;
+      addMessage({ to: uid, content: newMessage }).then(() => {
         // Create a temporary message object
         const tempMessage = {
-          time: Date.now(), 
-          from: localStorage.getItem("im-userid"),
+          time: Date.now(),
+          from: localStorage.getItem('im-userid'),
           to: uid,
           content: newMessage,
         };
@@ -116,9 +117,28 @@ const ChatWindow = ({uid}) => {
         setMessages((prevMessages) => [...prevMessages, tempMessage]);
   
         // Send message via websocket
-        socket.current.send(JSON.stringify({from: localStorage.getItem("im-userid"), to: uid, message: newMessage, type: 2}));
+        socket.current.send(
+          JSON.stringify({
+            from: localStorage.getItem('im-userid'),
+            to: uid,
+            message: newMessage,
+            type: 2,
+          })
+        );
       });
+    } else if (data.type === 'image') {
+      const file = data.content;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('to', uid);
+      addImg(formData).then((res) => {
+        // Handle image upload response here
+        // update the messages list with the new image message
+        // and send a websocket message to notify others about the new image
+      });
+    }
   };
+  
   
   useEffect(()=>{
     setupWebsocket(query);

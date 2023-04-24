@@ -15,7 +15,7 @@ export function addApply(data) {
   });
 }
 
-export function getApplications() {
+export function getApplys() {
   return request({
     url: "/friend/getApplications",
     method: "get",

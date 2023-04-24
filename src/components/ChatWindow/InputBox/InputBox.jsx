@@ -3,11 +3,11 @@ import styles from './InputBox.module.css';
 
 const InputBox = (props) => {
   const [message, setMessage] = useState('');
+  const [file, setFile] = useState(null);
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
-      props.onSend(message);
-      setMessage('');
+      handleSend();
     }
   };
 
@@ -15,9 +15,24 @@ const InputBox = (props) => {
     setMessage(event.target.value);
   };
 
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
+  };
+
   const handleButtonClick = () => {
-    props.onSend(message);
-    setMessage('');
+    handleSend();
+  };
+
+  const handleSend = () => {
+    if (message !== '') {
+      props.onSend({ type: 'text', content: message });
+      setMessage('');
+    }
+    if (file) {
+      props.onSend({ type: 'image', content: file });
+      setFile(null);
+      document.getElementById('imageInput').value = '';
+    }
   };
 
   return (
@@ -28,6 +43,12 @@ const InputBox = (props) => {
         onKeyDown={handleKeyDown}
         value={message}
         onChange={handleInputChange}
+      />
+      <input
+        type="file"
+        id="imageInput"
+        accept="image/*"
+        onChange={handleFileChange}
       />
       <button onClick={handleButtonClick}>Send</button>
     </div>
