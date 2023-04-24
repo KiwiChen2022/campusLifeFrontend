@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar/Sidebar";
 import ChatWindow from "../ChatWindow/ChatWindow";
 import { Notification } from "./Notification";
-import { getlist } from "../../api/friend";
+import { getList } from "../../api/friend";
 import styles from './Chats.module.css';
 
 
@@ -13,7 +13,7 @@ const Chats = () => {
   const [list, setList] = useState([]);
 
   useEffect(()=>{
-    getlist().then(res=>{
+    getList().then(res=>{
       setList(res.data)
     })
     },[])

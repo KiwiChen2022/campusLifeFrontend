@@ -1,0 +1,81 @@
+.friendContainer {
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .title {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  .friendList,
+  .applicationList {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .friendListItem,
+  .applicationListItem {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  
+  .addFriend {
+    display: flex;
+    align-items: stretch; 
+    margin-bottom: 20px;
+  }
+  
+  .addFriendInput {
+    flex: 1;
+    margin-right: 10px;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    height: 36px; 
+    box-sizing: border-box;
+  }
+  
+  .addFriendButton {
+    padding: 8px 16px;
+    background-color: #1a8cff;
+    font-size: 16px;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    height: 36px; 
+    line-height: 20px; 
+  }
+  
+  .addFriendButton:hover {
+    background-color: #167abf;
+  }
+  
+  .acceptButton {
+    margin-left: 10px;
+    padding: 4px 8px;
+    background-color: #1a8cff;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .acceptButton:hover {
+    background-color: #167abf;
+  }
+  
+  .friendImage {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+  }
+  

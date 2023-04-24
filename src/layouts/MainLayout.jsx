@@ -1,20 +1,3 @@
-// import React from "react";
-// import { Header,Navigation } from "../components";
-// import styles from "./MainLayout.module.css";
-
-// const MainLayout = ({ children, url }) => {
-//   return (
-//     <div className={styles.app}>
-//       <Header />
-//       <UserImageContext.Provider value={url}>
-//         <Navigation />
-//         <div className={styles.content}>{children}</div>
-//       </UserImageContext.Provider>
-//     </div>
-//   );
-// };
-
-// export default MainLayout;
 
 import React, { useState, useEffect } from "react";
 import { Navigation, Header } from "../components";
@@ -36,10 +19,10 @@ function MainLayout({ children }) {
 
   return (
     <div className={styles.app}>
-        <Header />
-        <UserImageContext.Provider value={url}>
-        <div>{children}</div>
-        </UserImageContext.Provider>
+      <Header />
+      <UserImageContext.Provider value={url}>
+        <div className={styles.container}>{children}</div>
+      </UserImageContext.Provider>
     </div>
   );
 }
