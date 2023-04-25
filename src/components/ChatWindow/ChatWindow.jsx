@@ -9,22 +9,37 @@ import styles from './ChatWindow.module.css';
 
 const ChatWindow = ({uid}) => {
   const socket = useRef(null);
-  const query = useMemo(() => ({ to: uid, pageNum: 1, pageSize: 10 }), [uid]);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [totalMessage, setTotalMessage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(-1);
 
   const messagesEndRef = useRef(null);
+  const baseUrl = "http://127.0.0.1:8081/ipfs/";
+
+  const getQuery = useCallback(
+    (pageNum) => ({ to: uid, pageNum, pageSize: 20 }),
+    [uid]
+  );
+
   
   const getAndSetMessages = async (query, append = false) => {
     try {
       setLoading(true);
+      console.log("query")
+      console.log(query)
+      console.log(typeof(query))
       const res = await list(query);
+      setTotalMessage(res.data.total);
+      setCurrentPage(res.data.currPage);
       setLoading(false);
-      if (res.data.list.length < query.pageSize) {
+      if (res.data.currPage == 1) {
         setHasMore(false);
       }
-
+      // console.log(res.data.list)
+      // console.log("origin: ")
+      // console.log(messages)
       if (append) {
         setMessages((prevMessages) => [...res.data.list, ...prevMessages]);
       } else {
@@ -34,6 +49,8 @@ const ChatWindow = ({uid}) => {
       console.log(error);
       setLoading(false);
     }
+      // console.log("new: ")
+      // console.log(messages)
   };
 
   const handleScroll = useCallback(
@@ -41,11 +58,14 @@ const ChatWindow = ({uid}) => {
       const { scrollTop, clientHeight, scrollHeight } = event.target;
 
       if (scrollTop === 0 && !loading && hasMore) {
-        query.pageNum += 1;
-        getAndSetMessages(query, true);
+        const newPageNum = currentPage - 1;
+        if (newPageNum > 0) {
+          const newQuery = getQuery(newPageNum);
+          getAndSetMessages(newQuery, true);
+        }
       }
     },
-    [loading, hasMore, query]
+    [loading, hasMore, currentPage, getQuery]
   );
   
 
@@ -56,17 +76,13 @@ const ChatWindow = ({uid}) => {
     }
     const messageHandler = (event) => {
       const data = JSON.parse(event.data);
-      if (data.type === 3){
-
-      }
-      else{
-        getAndSetMessages(query);
-      }
+        console.log("data: " + event.data);
+        // getAndSetMessages(query);
     };
 
     socket.current.addEventListener('message', messageHandler);
 
-    const e = {uid:localStorage.getItem("im-userid"),type:1};
+    const e = {uid:localStorage.getItem("im-userid"),type:9};
 
     const onOpen = () => {
       console.log('websocket connection established');
@@ -92,38 +108,25 @@ const ChatWindow = ({uid}) => {
   };
 
 
-
-  // const handleSend = (newMessage) => {
-  //   addMessage({to:uid,content:newMessage}).then(()=>{
-  //     getAndSetMessages(query);
-  //   }).then(()=>{
-  //     socket.send(JSON.stringify({from:localStorage.getItem("im-userid"),to:uid,message:newMessage,type:2}))
-  //   })
-  // };
-
   const handleSend = (data) => {
+    // console.log('handleSend data:', data);
     if (data.type === 'text') {
       const newMessage = data.content;
-      addMessage({ to: uid, content: newMessage }).then(() => {
-        // Create a temporary message object
-        const tempMessage = {
-          time: Date.now(),
-          from: localStorage.getItem('im-userid'),
-          to: uid,
-          content: newMessage,
-        };
-  
+      addMessage({ to: uid, content: newMessage }).then((res) => {
+        const tempMessage = res.data;
         // Update messages list with the new message
         setMessages((prevMessages) => [...prevMessages, tempMessage]);
-  
-        // Send message via websocket
+         // Send message via websocket
+         tempMessage.type = 2;
+         console.log("tempMessage: " + JSON.stringify(tempMessage))
         socket.current.send(
-          JSON.stringify({
-            from: localStorage.getItem('im-userid'),
-            to: uid,
-            message: newMessage,
-            type: 2,
-          })
+          JSON.stringify(tempMessage)
+          // JSON.stringify({
+          //   from: localStorage.getItem('im-userid'),
+          //   to: uid,
+          //   message: data.content,
+          //   type: 2,
+          // })
         );
       });
     } else if (data.type === 'image') {
@@ -131,22 +134,49 @@ const ChatWindow = ({uid}) => {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('to', uid);
-      addImg(formData).then((res) => {
+      
+      addImg({ to: uid, file: file }).then((res) => {
         // Handle image upload response here
         // update the messages list with the new image message
+        const tempMessage = res.data;
+        // Update messages list with the new message
+        setMessages((prevMessages) => [...prevMessages, tempMessage]);
         // and send a websocket message to notify others about the new image
+        console.log("Image upload successful:", res);
+        socket.current.send(
+          JSON.stringify({
+            from: localStorage.getItem('im-userid'),
+            to: uid,
+            message: data.content,
+            type: 2,
+          })
+        );
+
+      }).catch((error) => {
+        console.error("Image upload failed:", error);
       });
     }
+    // getAndSetMessages(getQuery(currentPage))
+    
+
+   
   };
   
   
-  useEffect(()=>{
-    setupWebsocket(query);
-  },[])
+  useEffect(() => {
+    setupWebsocket(getQuery(currentPage));
+  }, []);
+  
 
-  useEffect(()=>{
-    getAndSetMessages(query);
-  },[uid])
+
+  // useEffect(()=>{
+  //   getAndSetMessages(query);
+  // },[uid])
+
+  useEffect(() => {
+    getAndSetMessages(getQuery(currentPage));
+  }, [uid]);
+
 
   useEffect(() => {
     const scrollContainer = messagesEndRef.current;
@@ -165,9 +195,17 @@ const ChatWindow = ({uid}) => {
         onScroll={handleScroll}
       >
         {loading && <div>Loading more messages...</div>}
-        {messages.map((message) => (
-          <Message key={message.id} message={message} uid={uid} />
-        ))}
+        {messages.map((message) => {
+          if (message.type === 2){
+            if (!message.content.startsWith(baseUrl)) {
+              message.content = baseUrl + message.content;
+            }
+            console.log(message)
+          }
+
+          return <Message key={message.id} message={message} uid={uid} />
+        })}
+        
       </div>
       <InputBox onSend={handleSend} />
     </div>

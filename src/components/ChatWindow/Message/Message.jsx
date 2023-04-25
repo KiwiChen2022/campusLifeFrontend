@@ -4,6 +4,9 @@ import styles from "./Message.module.css";
 const Message = ({ message, uid }) => {
   const { from, time, type, content } = message;
   const messageClass = from === uid ? styles.message : styles.messageRight;
+  // const ipfsGateway = "http://127.0.0.1:8081/ipfs/"
+  // console.log(content)
+  // const imageURL = `${ipfsGateway}${content}`;
 
   const renderContent = () => {
     if (type === 2) {
