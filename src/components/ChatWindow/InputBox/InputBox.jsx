@@ -25,13 +25,14 @@ const InputBox = (props) => {
 
   const handleSend = () => {
     if (message !== '') {
-      props.onSend({ type: 'text', content: message });
+      props.onSend({ type: 1, content: message });
       setMessage('');
     }
     if (file) {
-      props.onSend({ type: 'image', content: file });
+      const fileType = file.type.startsWith('image/') ? 2 : 3;
+      props.onSend({ type: fileType, content: file });
       setFile(null);
-      document.getElementById('imageInput').value = '';
+      document.getElementById('fileInput').value = '';
     }
   };
 
@@ -46,8 +47,8 @@ const InputBox = (props) => {
       />
       <input
         type="file"
-        id="imageInput"
-        accept="image/*"
+        id="fileInput"
+        accept="*/*"
         onChange={handleFileChange}
       />
       <button onClick={handleButtonClick}>Send</button>

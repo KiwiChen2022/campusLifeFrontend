@@ -16,7 +16,7 @@ export function addMessage(data) {
   });
 }
 
-export function addImg(data) {
+export function addFile(data) {
   const formData = new FormData();
   formData.append("to", data.to);
   formData.append("file", data.file);

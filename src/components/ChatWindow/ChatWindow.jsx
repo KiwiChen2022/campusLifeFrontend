@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { InputBox } from './InputBox';
 import { Message } from './Message';
 import WebSocketClient from '../../utils/websocketClient';
-import { list, addMessage, addImg } from '../../api/message';
+import { list, addMessage, addFile } from '../../api/message';
 import styles from './ChatWindow.module.css';
 
 
@@ -65,7 +65,7 @@ const ChatWindow = ({uid}) => {
 
 
   const handleSend = (data) => {
-    if (data.type === 'text') {
+    if (data.type === 1) {
       const newMessage = data.content;
       addMessage({ to: uid, content: newMessage }).then((res) => {
         socket.current.send(
@@ -79,14 +79,14 @@ const ChatWindow = ({uid}) => {
         getAndSetMessages(query)
 
       });
-    } else if (data.type === 'image') {
+    } else  {
       const file = data.content;
       const formData = new FormData();
       formData.append('file', file);
       formData.append('to', uid);
       
-      addImg({ to: uid, file: file }).then((res) => {
-        console.log("Image upload successful:", res);
+      addFile({ to: uid, file: file }).then((res) => {
+        console.log("File upload successful:", res);
         socket.current.send(
           JSON.stringify({
             from: localStorage.getItem('im-userid'),
@@ -97,7 +97,7 @@ const ChatWindow = ({uid}) => {
         );
         getAndSetMessages(query)
       }).catch((error) => {
-        console.error("Image upload failed:", error);
+        console.error("File upload failed:", error);
       });
     }
   };
@@ -144,7 +144,7 @@ const ChatWindow = ({uid}) => {
         ref={messagesEndRef}
       >
         {messages.map((message,index) => {
-          if (message.type === 2){
+          if (message.type == 2 || message.type == 3){
             if (!message.content.startsWith(baseUrl)) {
               message.content = baseUrl + message.content;
             }
