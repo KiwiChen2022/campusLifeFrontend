@@ -17,8 +17,8 @@ export function getUserByUserName(data) {
 
 export function updateUser(data) {
   return request({
-    url: "/user",
-    method: "put",
+    url: "/user/updateInfo",
+    method: "post",
     data,
   });
 }

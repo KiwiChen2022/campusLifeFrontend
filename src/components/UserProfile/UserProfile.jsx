@@ -7,21 +7,17 @@ import { FaUserCircle } from "react-icons/fa";
 const UserProfile = () => {
   const [user, setUser] = useState({});
   const [isEditing, setIsEditing] = useState(false);
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [image, setImage] = useState("");
 
   useEffect(() => {
     getUser().then((res) => {
       setUser(res.data);
-      setUsername(res.data.username);
       setPassword(res.data.password);
-      setImage(res.data.image);
     });
   }, []);
 
   const handleSave = async () => {
-    await updateUser({ username, password, image });
+    await updateUser({ password });
     setIsEditing(false);
   };
 
@@ -39,19 +35,9 @@ const UserProfile = () => {
       {isEditing ? (
         <>
           <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-          />
-          <input
-            type="text"
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
           />
           <button onClick={handleSave}>Save</button>
         </>
@@ -59,16 +45,11 @@ const UserProfile = () => {
         <>
           <h2>{user.username}</h2>
           {user.password && <p>Password: {'*'.repeat(user.password.length)}</p>}
-          <button onClick={handleEdit}>Edit</button>
+          <button onClick={handleEdit}>Edit Password</button>
         </>
       )}
     </div>
   );
 };
-
-
-
-
-
 
 export default UserProfile;

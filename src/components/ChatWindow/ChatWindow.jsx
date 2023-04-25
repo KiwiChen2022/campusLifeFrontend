@@ -11,63 +11,21 @@ const ChatWindow = ({uid}) => {
   const socket = useRef(null);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [totalMessage, setTotalMessage] = useState(0);
-  const [currentPage, setCurrentPage] = useState(-1);
-
   const messagesEndRef = useRef(null);
   const baseUrl = "http://127.0.0.1:8081/ipfs/";
-
-  const getQuery = useCallback(
-    (pageNum) => ({ to: uid, pageNum, pageSize: 20 }),
-    [uid]
-  );
-
+  const query = useMemo(() => ({ to: uid, pageNum: 1, pageSize: 100 }), [uid]);
   
-  const getAndSetMessages = async (query, append = false) => {
+  const getAndSetMessages = async (query) => {
     try {
       setLoading(true);
-      console.log("query")
-      console.log(query)
-      console.log(typeof(query))
       const res = await list(query);
-      setTotalMessage(res.data.total);
-      setCurrentPage(res.data.currPage);
       setLoading(false);
-      if (res.data.currPage == 1) {
-        setHasMore(false);
-      }
-      // console.log(res.data.list)
-      // console.log("origin: ")
-      // console.log(messages)
-      if (append) {
-        setMessages((prevMessages) => [...res.data.list, ...prevMessages]);
-      } else {
-        setMessages(res.data.list);
-      }
+      setMessages(res.data.list);
     } catch (error) {
       console.log(error);
       setLoading(false);
     }
-      // console.log("new: ")
-      // console.log(messages)
   };
-
-  const handleScroll = useCallback(
-    (event) => {
-      const { scrollTop, clientHeight, scrollHeight } = event.target;
-
-      if (scrollTop === 0 && !loading && hasMore) {
-        const newPageNum = currentPage - 1;
-        if (newPageNum > 0) {
-          const newQuery = getQuery(newPageNum);
-          getAndSetMessages(newQuery, true);
-        }
-      }
-    },
-    [loading, hasMore, currentPage, getQuery]
-  );
-  
 
   const setupWebsocket = (query) => {
     // set up websocket
@@ -75,9 +33,7 @@ const ChatWindow = ({uid}) => {
       socket.current = new WebSocketClient('ws://127.0.0.1:8004/ws');
     }
     const messageHandler = (event) => {
-      const data = JSON.parse(event.data);
-        console.log("data: " + event.data);
-        // getAndSetMessages(query);
+        getAndSetMessages(query);
     };
 
     socket.current.addEventListener('message', messageHandler);
@@ -109,25 +65,19 @@ const ChatWindow = ({uid}) => {
 
 
   const handleSend = (data) => {
-    // console.log('handleSend data:', data);
     if (data.type === 'text') {
       const newMessage = data.content;
       addMessage({ to: uid, content: newMessage }).then((res) => {
-        const tempMessage = res.data;
-        // Update messages list with the new message
-        setMessages((prevMessages) => [...prevMessages, tempMessage]);
-         // Send message via websocket
-         tempMessage.type = 2;
-         console.log("tempMessage: " + JSON.stringify(tempMessage))
         socket.current.send(
-          JSON.stringify(tempMessage)
-          // JSON.stringify({
-          //   from: localStorage.getItem('im-userid'),
-          //   to: uid,
-          //   message: data.content,
-          //   type: 2,
-          // })
+          JSON.stringify({
+            from: localStorage.getItem('im-userid'),
+            to: uid,
+            message: newMessage,
+            type: 2,
+          })
         );
+        getAndSetMessages(query)
+
       });
     } else if (data.type === 'image') {
       const file = data.content;
@@ -136,74 +86,81 @@ const ChatWindow = ({uid}) => {
       formData.append('to', uid);
       
       addImg({ to: uid, file: file }).then((res) => {
-        // Handle image upload response here
-        // update the messages list with the new image message
-        const tempMessage = res.data;
-        // Update messages list with the new message
-        setMessages((prevMessages) => [...prevMessages, tempMessage]);
-        // and send a websocket message to notify others about the new image
         console.log("Image upload successful:", res);
         socket.current.send(
           JSON.stringify({
             from: localStorage.getItem('im-userid'),
             to: uid,
-            message: data.content,
+            message: file,
             type: 2,
           })
         );
-
+        getAndSetMessages(query)
       }).catch((error) => {
         console.error("Image upload failed:", error);
       });
     }
-    // getAndSetMessages(getQuery(currentPage))
-    
-
-   
   };
   
+  const shouldShowMiddleTimestamp = (currentMessage, previousMessage) => {
+    const threshold = 600000; // 10 minutes in milliseconds
+    const currentTime = new Date(currentMessage.time);
+    const previousTime = new Date(previousMessage.time);
+  
+    return currentTime - previousTime > threshold;
+  };
+  
+  const formatTimestamp = (timestamp) => {
+    const date = new Date(timestamp);
+    const formattedDate = new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
+    return formattedDate;
+  };
   
   useEffect(() => {
-    setupWebsocket(getQuery(currentPage));
+    setupWebsocket(query);
   }, []);
   
-
-
-  // useEffect(()=>{
-  //   getAndSetMessages(query);
-  // },[uid])
-
   useEffect(() => {
-    getAndSetMessages(getQuery(currentPage));
+    getAndSetMessages(query);
   }, [uid]);
 
-
   useEffect(() => {
-    const scrollContainer = messagesEndRef.current;
-    scrollContainer.addEventListener('scroll', handleScroll);
-    return () => {
-      scrollContainer.removeEventListener('scroll', handleScroll);
-    };
-  }, [handleScroll]);
-
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+    }
+  }, [messages]);
+  
 
   return (
     <div className={styles.chatWindow}>
       <div
         className={styles.messages}
         ref={messagesEndRef}
-        onScroll={handleScroll}
       >
-        {loading && <div>Loading more messages...</div>}
-        {messages.map((message) => {
+        {messages.map((message,index) => {
           if (message.type === 2){
             if (!message.content.startsWith(baseUrl)) {
               message.content = baseUrl + message.content;
             }
-            console.log(message)
           }
-
-          return <Message key={message.id} message={message} uid={uid} />
+          const showMiddleTimestamp =
+          index > 0 && shouldShowMiddleTimestamp(message, messages[index - 1]);
+      
+          return (
+            <React.Fragment key={message.id}>
+              {showMiddleTimestamp && (
+                <div className={styles.middleTimestamp}>
+                  {formatTimestamp(message.time)}
+                </div>
+              )}
+              <Message message={message} uid={uid} />
+            </React.Fragment>)
         })}
         
       </div>
