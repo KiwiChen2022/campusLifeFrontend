@@ -34,18 +34,18 @@ const ChatWindow = ({uid}) => {
     }
     const messageHandler = (event) => {
       console.log('Received message from server:', event.data);
-        getAndSetMessages(query);
+      getAndSetMessages(query);
     };
-
+  
     socket.current.addEventListener('message', messageHandler);
-
-    const e = {uid:localStorage.getItem("im-userid"),type:1};
-
+  
+    const e = { uid: localStorage.getItem("im-userid"), type: 1 };
+  
     const onOpen = () => {
       console.log('websocket connection established');
       socket.current.send(JSON.stringify(e));
     };
-
+  
     if (socket.current.socket.readyState === WebSocket.OPEN) {   //socket.current is a wrapper of websocket
       // websocket is already open, send the message
       console.log('websocket connection already open');
@@ -54,15 +54,22 @@ const ChatWindow = ({uid}) => {
       // wait for websocket to open, then send the message
       socket.current.addEventListener('open', onOpen);
     }
-
+  
     return () => {
       socket.current.removeEventListener('message', messageHandler);
       socket.current.removeEventListener('open', onOpen);
-      if (socket.current) {
-        socket.current.close();
-      }
+      // No need to close the websocket here, as it will be reused for the next user
     };
   };
+  
+  // Call setupWebsocket() in a useEffect hook that depends on uid
+  useEffect(() => {
+    const cleanup = setupWebsocket(query);
+    return () => {
+      cleanup();
+    };
+  }, [uid]);
+  
 
 
   const handleSend = (data) => {
@@ -137,9 +144,9 @@ const ChatWindow = ({uid}) => {
     scrollToBottom();
   };
   
-  useEffect(() => {
-    setupWebsocket(query);
-  }, []);
+  // useEffect(() => {
+  //   setupWebsocket(query);
+  // }, [uid]);
   
   useEffect(() => {
     getAndSetMessages(query);

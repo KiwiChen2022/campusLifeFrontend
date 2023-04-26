@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { getUser, updateUser } from "../../api/user";
 import styles from "./UserProfile.module.css";
 import CryptoJS from "crypto-js";
 import { updateUserImage } from "../../api/user";
 import { FaUserCircle } from "react-icons/fa";
+import UserImageContext from "../../contexts/UserImageContext";
 
 const UserProfile = () => {
+  const userUrl = useContext(UserImageContext);
   let fileInput;
   const [selectedImage, setSelectedImage] = useState(null);
 
@@ -62,8 +64,8 @@ const UserProfile = () => {
 
   return (
     <div className={styles.userProfile}>
-      {user.image ? (
-        <img src={user.image} alt={user.username} />
+      {userUrl ? (
+        <img src={userUrl} alt={user.username} />
       ) : (
         <FaUserCircle size={100} />
       )}
@@ -75,7 +77,7 @@ const UserProfile = () => {
         style={{ display: "none" }}
         ref={(input) => (fileInput = input)}
       />
-      <button onClick={() => fileInput.click()}>Change Image</button>
+      <button onClick={() => fileInput.click()}>Change Avatar</button>
       {selectedImage && <button onClick={handleImageUpload}>Upload Image</button>}
       {isEditing ? (
         <>
@@ -89,7 +91,7 @@ const UserProfile = () => {
       ) : (
         <>
           <h2>{user.username}</h2>
-          {user.password && <p>Password: {'*'.repeat(10)}</p>}
+          <p>Password: {'*'.repeat(10)}</p>
           <button onClick={handleEdit}>Edit Password</button>
         </>
       )}

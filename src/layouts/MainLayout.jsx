@@ -13,16 +13,11 @@ function MainLayout({ children }) {
 
     const isUrl = (url) => {
       const pattern = new RegExp(
-        '^(https?:\\/\\/)?' + // protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-        '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-        '(\\#[-a-z\\d_]*)?$',
-        'i'
-      ); // fragment locator
+        '^https?:\\/\\/' // protocol (http or https)
+      );
       return !!pattern.test(url);
     };
+    
     
     const getImageUrl = (imageUrl) => {
       const baseUrl = "http://127.0.0.1:8081/ipfs/";
@@ -40,6 +35,7 @@ function MainLayout({ children }) {
     <div className={styles.app}>
       <Header />
       <UserImageContext.Provider value={getImageUrl(url)}>
+      {/* <UserImageContext.Provider value={url}> */}
         <div className={styles.container}>{children}</div>
       </UserImageContext.Provider>
     </div>

@@ -43,6 +43,19 @@ function Friend() {
     fetchApplys();
   };
 
+  const isUrl = (url) => {
+    const pattern = new RegExp(
+      '^https?:\\/\\/' // protocol (http or https)
+    );
+    return !!pattern.test(url);
+  };
+  
+  
+  const getImageUrl = (imageUrl) => {
+    const baseUrl = "http://127.0.0.1:8081/ipfs/";
+    return isUrl(imageUrl) ? imageUrl : baseUrl + imageUrl;
+  };
+
 
   return (
     <div className={styles.friendContainer}>
@@ -51,7 +64,7 @@ function Friend() {
         {friends.map((friend) => (
           <li key={friend.id} className={styles.friendListItem}>
             <img
-              src={friend.image}
+              src={getImageUrl(friend.image)}
               alt={friend.username}
               className={styles.friendImage}
             />
@@ -76,7 +89,7 @@ function Friend() {
       {searchedUser && (
         <div className={styles.searchResult}>
           <img
-            src={searchedUser.image}
+            src={getImageUrl(searchedUser.image)}
             alt={searchedUser.username}
             className={styles.friendImage}
           />
@@ -92,7 +105,7 @@ function Friend() {
         {applys.map((apply) => (
                     <li key={apply.id} className={styles.applyListItem}>
                     <img
-                        src={apply.image}
+                        src={getImageUrl(apply.image)}
                         alt={apply.username}
                         className={styles.friendImage}
                       />
