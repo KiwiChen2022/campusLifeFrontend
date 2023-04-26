@@ -20,6 +20,7 @@ export function addFile(data) {
   const formData = new FormData();
   formData.append("to", data.to);
   formData.append("file", data.file);
+  formData.append("type", data.type);
 
   return request({
     url: "/message/addImg",

@@ -54,5 +54,29 @@
   height: auto;
   border-radius: 0%;
   margin-top: 0;
+  border-radius: 3%;
 }
 
+.fileLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  padding: 6px;
+}
+
+.fileLink:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+
+.fileIcon {
+  font-size: 24px;
+  margin-right: 8px;
+}
+
+.fileName {
+  font-size: 16px;
+}

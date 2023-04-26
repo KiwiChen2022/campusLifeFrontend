@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./Message.module.css";
 
-const Message = ({ message, uid }) => {
+const Message = ({ message, uid, onImageLoad }) => {
 
   const { from, time, type, content } = message;
   const messageClass = from === uid ? styles.message : styles.messageRight;
@@ -13,7 +13,7 @@ const Message = ({ message, uid }) => {
   const renderContent = () => {
     
     if (type === 2) {
-      return <img src={content} alt="photo" className={styles.image} />;
+      return <img src={content} alt="photo" className={styles.image} onLoad={onImageLoad}  />;
     } else if (type === 3) {
       console.log(content)
       return (

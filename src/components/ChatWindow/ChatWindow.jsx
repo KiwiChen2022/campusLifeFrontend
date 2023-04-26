@@ -33,12 +33,13 @@ const ChatWindow = ({uid}) => {
       socket.current = new WebSocketClient('ws://127.0.0.1:8004/ws');
     }
     const messageHandler = (event) => {
+      console.log('Received message from server:', event.data);
         getAndSetMessages(query);
     };
 
     socket.current.addEventListener('message', messageHandler);
 
-    const e = {uid:localStorage.getItem("im-userid"),type:9};
+    const e = {uid:localStorage.getItem("im-userid"),type:1};
 
     const onOpen = () => {
       console.log('websocket connection established');
@@ -76,6 +77,7 @@ const ChatWindow = ({uid}) => {
             type: 2,
           })
         );
+        
         getAndSetMessages(query)
 
       });
@@ -84,8 +86,10 @@ const ChatWindow = ({uid}) => {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('to', uid);
+      console.log(data.type)
+      console.log(typeof(data.type))
       
-      addFile({ to: uid, file: file }).then((res) => {
+      addFile({ to: uid, file: file, type: data.type }).then((res) => {
         console.log("File upload successful:", res);
         socket.current.send(
           JSON.stringify({
@@ -121,6 +125,17 @@ const ChatWindow = ({uid}) => {
     }).format(date);
     return formattedDate;
   };
+
+
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+    }
+  };
+
+  const handleImageLoad = () => {
+    scrollToBottom();
+  };
   
   useEffect(() => {
     setupWebsocket(query);
@@ -131,9 +146,7 @@ const ChatWindow = ({uid}) => {
   }, [uid]);
 
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
-    }
+    scrollToBottom();
   }, [messages]);
   
 
@@ -159,7 +172,7 @@ const ChatWindow = ({uid}) => {
                   {formatTimestamp(message.time)}
                 </div>
               )}
-              <Message message={message} uid={uid} />
+              <Message message={message} uid={uid} onImageLoad={handleImageLoad} />
             </React.Fragment>)
         })}
         

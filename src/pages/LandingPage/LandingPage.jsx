@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { login, register } from "../../api/login";
 import styles from "./LandingPage.module.css";
 import { SuccessMessage } from "../../components";
+import CryptoJS from "crypto-js";
 
 function LandingPage() {
   const [username, setUsername] = useState("");
@@ -15,9 +16,10 @@ function LandingPage() {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    const encryptedPassword = CryptoJS.SHA256(password).toString();
     const user = {
       username: username,
-      password: password,
+      password: encryptedPassword,
     };
 
     login(user).then((res) => {
@@ -27,6 +29,7 @@ function LandingPage() {
   };
 
   const handleRegister = async () => {
+    const encryptedPassword = CryptoJS.SHA256(registerPassword).toString();
     if (registerPassword !== registerConfirmPassword) {
       alert("Passwords do not match");
       return;
@@ -34,7 +37,7 @@ function LandingPage() {
 
     const user = {
       username: registerUsername,
-      password: registerPassword,
+      password: encryptedPassword,
     };
 
     try {

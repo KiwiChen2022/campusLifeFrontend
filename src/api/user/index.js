@@ -22,3 +22,18 @@ export function updateUser(data) {
     data,
   });
 }
+
+export function updateUserImage(formData) {
+  // const formData = new FormData();
+  // formData.append("to", data.to);
+  // formData.append("file", data.file);
+  // formData.append("type", data.type);
+  return request({
+    url: "/user/image",
+    method: "post",
+    data: formData,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}

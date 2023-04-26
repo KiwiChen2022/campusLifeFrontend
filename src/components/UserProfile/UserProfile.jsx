@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { getUser, updateUser } from "../../api/user";
 import styles from "./UserProfile.module.css";
-
+import CryptoJS from "crypto-js";
+import { updateUserImage } from "../../api/user";
 import { FaUserCircle } from "react-icons/fa";
 
 const UserProfile = () => {
+  let fileInput;
+  const [selectedImage, setSelectedImage] = useState(null);
+
   const [user, setUser] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [password, setPassword] = useState("");
@@ -12,17 +16,48 @@ const UserProfile = () => {
   useEffect(() => {
     getUser().then((res) => {
       setUser(res.data);
-      setPassword(res.data.password);
     });
   }, []);
 
   const handleSave = async () => {
-    await updateUser({ password });
+    console.log(password)
+    console.log(typeof(password))
+    const encryptedPassword = CryptoJS.SHA256(password).toString();
+    console.log(encryptedPassword)
+    await updateUser({ password: encryptedPassword });
     setIsEditing(false);
   };
 
   const handleEdit = () => {
     setIsEditing(true);
+  };
+
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedImage(e.target.files[0]);
+    }
+  };
+
+  const handleImageUpload = async () => {
+    if (!selectedImage) {
+      alert("No image selected");
+      return;
+    }
+    
+    const formData = new FormData();
+    formData.append("file", selectedImage);
+  
+    try {
+      const response = await updateUserImage(formData);
+      if (response.data) {
+        setUser((prevUser) => ({ ...prevUser, image: response.data }));
+      } else {
+        alert("Image upload failed");
+      }
+    } catch (error) {
+    }
+    
+    setSelectedImage(null);
   };
 
   return (
@@ -32,6 +67,16 @@ const UserProfile = () => {
       ) : (
         <FaUserCircle size={100} />
       )}
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleImageChange}
+        style={{ display: "none" }}
+        ref={(input) => (fileInput = input)}
+      />
+      <button onClick={() => fileInput.click()}>Change Image</button>
+      {selectedImage && <button onClick={handleImageUpload}>Upload Image</button>}
       {isEditing ? (
         <>
           <input
@@ -44,7 +89,7 @@ const UserProfile = () => {
       ) : (
         <>
           <h2>{user.username}</h2>
-          {user.password && <p>Password: {'*'.repeat(user.password.length)}</p>}
+          {user.password && <p>Password: {'*'.repeat(10)}</p>}
           <button onClick={handleEdit}>Edit Password</button>
         </>
       )}
