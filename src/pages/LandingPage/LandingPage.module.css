@@ -42,3 +42,14 @@
     background-color: #0056b3;
   }
   
+  .successMessageWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 100;
+  }
+  

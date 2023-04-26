@@ -51,12 +51,14 @@ function LandingPage() {
   return (
     <div className={styles.landingPage}>
       {successMessage && (
+        <div className={styles.successMessageWrapper}>
         <SuccessMessage
           message={successMessage}
           onClose={() => {
             setSuccessMessage(null);
           }}
         />
+        </div>
       )}
       <div className={styles.card}>
         <h1>Login</h1>
